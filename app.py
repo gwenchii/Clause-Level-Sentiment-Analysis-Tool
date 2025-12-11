@@ -27,7 +27,7 @@ def extract_discourse_markers(text):
     return re.findall(all_discourse_markers, text, flags=re.IGNORECASE)
 
 #load model
-loaded = joblib.load(r"models\taglish_sentiment_model.pkl")
+loaded = joblib.load(r"C:\Users\mynam\Downloads\Clause Level Sentiment Analysis Tool\models\taglish_sentiment_model.pkl")
 
 if isinstance(loaded, dict):
     vectorizer = loaded.get("vectorizer")
