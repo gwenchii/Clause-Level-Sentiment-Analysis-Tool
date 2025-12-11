@@ -1,7 +1,9 @@
-from flask import Flask, request, render_template, redirect, url_for
 import joblib
-import numpy as np
 import re
+import os
+from flask import Flask, request, render_template, redirect, url_for
+from datetime import datetime
+import numpy as np
 
 #Discourse Markers
 tagalog_discourse_markers = r"\b(?:at|kung|hanggang|hangga’t|bagama’t|nang|o|kaya|pero|dahil\ sa|dahilan\ sa|gawa\ ng|sapagka’t|upang|sakali|noon|sa\ sandali|magbuhat|magmula|bagaman|maliban|bukod|dangan|dahil|yayamang|kapag|pagka|tuwing|matapos|pagkatapos|porke|maski|imbis|sa\ lugar|sa\ halip|miyentras|para|saka|haba|samantala|bago|kundi)\b"
@@ -27,7 +29,9 @@ def extract_discourse_markers(text):
     return re.findall(all_discourse_markers, text, flags=re.IGNORECASE)
 
 #load model
-loaded = joblib.load(r"C:\Users\mynam\Downloads\Clause Level Sentiment Analysis Tool\models\taglish_sentiment_model.pkl")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "taglish_sentiment_model.pkl")
+loaded = joblib.load(MODEL_PATH)
 
 if isinstance(loaded, dict):
     vectorizer = loaded.get("vectorizer")
@@ -160,6 +164,6 @@ def leave_a_feedback():
 def about():
     return render_template('about.html')
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
