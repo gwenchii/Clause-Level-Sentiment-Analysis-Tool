@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        {% block title %}
+            Clause-Level Sentiment Analysis Using Discourse Markers
+        {% endblock %}
+    </title> 
+    <style>
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #FFFFFF;
+            border-bottom: 3px solid #7B61FF;
+            box-shadow: 0 2px 10px rgba(123, 97, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 3rem;
+            z-index: 100;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #F8F7FF;
+            color: #2E2E2E;
+            margin: 0;
+            padding-top: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        /* Navbar */
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        .nav-links a {
+            color: #020202;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 24px;
+        }
+        .nav-links a:hover {
+            color: #6C63FF;;
+            background-color: #FFFFFF;
+            border-color: #6C63FF;
+        }
+        /* Footer */
+        footer {
+            color: #333333;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+            width: 100%;
+            font-size: 0.9rem;
+            border-top: 2px solid #6C63FF; 
+        }
+        /* white container */
+        .container {
+            text-align: center;
+            background: #FFFFFF;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.1);
+            width: 90%;
+            max-width: 1300px;
+            margin: 1in auto;
+            box-sizing: border-box;
+            font-size: 20px;
+        }
+        textarea {
+            width: 80%;
+            height: 250px;
+            padding: 1rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid #6C63FF;
+            background-color: #FFFFFF;
+        }
+        h1.title {
+            font-size: 36px;
+            margin-bottom: 1rem;
+        }
+
+        h1{
+            color: #333333;
+            text-align: center;
+            font-size: 36px;
+            padding: 20px;
+        }
+        /* buttons */   
+        input[type="submit"]{
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            border:  #5848E6;
+            border-radius: 0.5rem;
+            background-color:  #5848E6;
+            color: #FFFFFF;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+        input[type="button"]{
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            border:  #6C63FF;
+            border-radius: 0.5rem;
+            background-color:  #6C63FF;
+            color: #FFFFFF;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+        /* Results Table */   
+        .results-container {
+            margin-left: 7rem;
+            margin-right: 7rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        table.results {
+            border: 1px solid #020009;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            padding: 0;
+            background-color: #FFFFFF;    
+            box-shadow: 0 0 15px rgba(108, 99, 255, 0.15);
+            overflow: hidden;
+            width: 100%;
+            
+        }
+        table.results th {
+            background-color: #6C63FF;
+            color: #FFFFFF;
+            font-weight: 600;
+            text-align: center;
+            padding: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #020009;
+        }
+        table.results td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #EDEDED;
+            color: #333333;
+            border: 1px solid #020009;
+        }
+        td.sentence {
+            font-weight: 600;
+            color: #6C63FF;
+            background-color: #F2F1FF;
+        }
+        /* Sentiment Colors */
+        .positive { color: #0ec408; font-weight: bold; }
+        .neutral { color: #e6b800; font-weight: bold; }
+        .negative { color: #ff0000; font-weight: bold; }
+        /* Feedback Page */
+        div.feedback-section{
+            margin: 2rem 7rem;
+        }
+        div.feedbackContainer{
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        /*sort dropdown*/
+        div.row{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        select#sortSelect{
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 2px solid #6C63FF; 
+            background-color:#FFFFFF;
+            color: #333333;  
+            transition: 0.3s;
+        }
+        label.sortSelect{
+            font-size: 1rem;
+            margin-right: 0.5rem;
+            font-weight: 500;
+            color: #333333;
+        }
+        /*feedback cards*/
+        div.feedback-row{
+            display: flex;
+            width: 100%;
+        }
+        div.feedback-card{
+            flex: 1;
+            background-color: #FFFFFF;
+            border: 1px solid #6C63FF;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+            display: flex;
+            justify-content: space-between;           
+        }
+        div.feedback-card span.timestamp{
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 0.5rem;
+            display: block;
+            text-align: right;
+        }
+        div.feedback-card p.feedback{
+            font-size: 1.1rem;
+            margin: 0;
+            flex: 1;
+            text-align:left;
+            color: #3333;
+        }
+        /*about page*/
+        div.about{
+            text-align: left;
+        }
+        p{
+            font-size: 18px;
+            color: #333333;
+            line-height: 1.6;
+        }
+        h2{
+            color: #333333;
+            font-size: 28px;
+            margin-top: 2rem;
+        }
+        span{
+            font-weight: bold;
+        }
+        ol {   
+            font-size: 0.95rem;
+            line-height: 1.6; 
+            padding-left: 2rem; 
+            margin: 1rem 0;
+        } 
+        ol li{
+            margin-bottom: 0.75rem; 
+            padding-left: 0.5rem;
+        }
+        ul li{
+            margin-bottom: 0.5rem;
+        }
+        p.note{
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0;
+            font-style: italic;
+        }
+    </style>
+    <script>
+        function sortFeedback() {
+            const selected = document.getElementById('sortSelect').value;
+            const cards = document.querySelectorAll('.feedback-card');
+
+            cards.forEach(card => {
+                const sentiment = card.getAttribute('data-sentiment');
+                if (selected === 'all' || sentiment === selected) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</head>
+    <body>
+        <header>
+            <h1></h1>
+            <div class="nav-links">
+                <a href="/">Analyze</a>
+                <a href="/leave_a_feedback">Feedback</a>
+                <a href="/about_tool">About the Tool</a>
+            </div>
+        </header>
+
+        <div class="container">
+            {% block content %} <!---Content----> {% endblock %}
+        </div>
+
+        <footer>
+            &copy; 2025  Clause-Level Sentiment Analysis Using Discourse Markers 
+        </footer>
+    </body>
+</html>

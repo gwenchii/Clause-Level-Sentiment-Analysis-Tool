@@ -1,0 +1,76 @@
+{% extends "header.html" %}
+    {% block title %} Leave a Feedback {% endblock %}
+{% block content %}
+<h1 class="title">Leave a Feedback</h1>
+<!--Text Area-->
+<form method="POST">
+    <textarea name="user_input" rows="5" placeholder="Paste your text here..." required></textarea>
+    <br>
+    <input type="submit" value="Post Review">
+</form>
+<!--Sort section-->
+<div class="feedback-section">
+    <div class="row">
+        <h2>User Feedback {{ active_filter }}</h2>
+        <div>
+            <label for="sortSelect"><strong>Sort by:</strong></label>
+            <select id="sortSelect" onchange="sortFeedback()">
+                <option value="all">All</option>
+                <option value="positive">Positive</option>
+                <option value="neutral">Neutral</option>
+                <option value="negative">Negative</option>
+            </select>
+        </div>
+    </div>
+<!--Feedback Container-->
+    <div id="feedbackContainer">
+        {% if feedbacks %}
+            {% for feedback in feedbacks %}
+            <div class="feedback-row">
+                <div class="feedback-card" data-sentiment="{{ feedback.sentiment }}">
+                    <p class="feedback">
+                        {{ feedback.text }}
+                        <span class="timestamp"> Posted on {{ feedback.timestamp }}</span>
+                    </p>
+                </div>
+            </div>
+            
+            {% endfor %}
+        {% else %}
+            <p class="no-feedback">No feedback found.</p>
+        {% endif %}
+    </div>
+</div>
+<script>
+function sortFeedback() {
+    const selected = document.getElementById('sortSelect').value;
+    const cards = Array.from(document.querySelectorAll('.feedback-card'));
+    const container = document.getElementById('feedbackContainer');
+    let visibleCards = [];
+
+    const existingMessage = document.querySelector('.no-feedback');
+    if (existingMessage) existingMessage.remove();
+
+    cards.forEach(card => {
+        const sentiment = card.getAttribute('data-sentiment');
+        if (selected === 'all' || sentiment === selected) {
+            card.style.display = 'block';
+            visibleCards.push(card);
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    if (visibleCards.length === 0) {
+        const message = document.createElement('p');
+        message.textContent = 'No feedback found.';
+        message.classList.add('no-feedback');
+        message.style.textAlign = 'center';
+        message.style.padding = '20px';
+        message.style.color = '#666';
+        container.appendChild(message);
+        return;
+    }
+}
+</script>
+{% endblock %}

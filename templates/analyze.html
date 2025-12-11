@@ -1,0 +1,65 @@
+{% extends "header.html" %}
+    {% block title %} Clause-Level Sentiment Analysis Using Discourse Markers {% endblock %}
+{% block content %}
+
+<h1 class="title">Clause-Level Sentiment Analysis Using Discourse Markers</h1>
+<!--Text Area-->
+<form method="POST">
+    <textarea name="user_input" rows="5" placeholder="Paste your text here..." required></textarea><br>
+    <input type="submit" value="Analyze Text">
+    <input type="button" value="Clear" onclick="window.location.href='{{ url_for('analyze') }}';">
+</form>
+<!--Results Section-->
+{% if results %}
+    <h1>RESULTS</h1>
+    {% for item in results %} 
+        <div class="results-container">
+            <table class="results">
+                <!--Sentence Row-->
+                <tr>
+                    <td class="sentence" colspan="3">{{ item.sentence }}</td>
+                </tr>
+                <!--Overall Sentiment Row-->
+                <tr>
+                    <td class="sentiment" colspan="3">
+                    Your overall text sentiment is detected as: 
+                        {{ "%.2f"|format(item.overall_percentage) }}%
+                        <strong class="{{ item.overall }}">{{ item.overall | capitalize }}</strong>
+                    </td>
+                </tr>
+                <!--Discourse Markers Row-->
+                <tr>
+                    <td class="discourse" colspan="3">
+                        <strong>Discourse markers present:</strong>
+                        {% if item.discourse_markers %}
+                            {{ item.discourse_markers | join(", ") }}
+                        {% else %}
+                            None
+                        {% endif %}
+                    </td>
+                </tr>
+                <!--Clause Row-->
+                <tr class="results">
+                    <th>Clause</th>
+                    <th>Sentiment</th>
+                    <th>Probabilities</th>
+                </tr>
+                {% for clause in item.clauses %}
+                    <tr>
+                        <td>{{ clause.clause }}</td>
+                        <td class="{{ clause.sentiment }}">
+                            {{ clause.sentiment | capitalize }}
+                        </td>
+                        <td>
+                            Positive: {{ "%.2f"|format(clause.probabilities.positive) }}% <br>
+                            Neutral: {{ "%.2f"|format(clause.probabilities.neutral) }}% <br>
+                            Negative: {{ "%.2f"|format(clause.probabilities.negative) }}%
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% endblock %}
